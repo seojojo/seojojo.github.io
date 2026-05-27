@@ -11,7 +11,8 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
         with:
-          submodules: false # 과거의 서브모듈 기록을 무시합니다.
+          submodules: false  # 이 한 줄이 핵심입니다.
+          fetch-depth: 0
 
       - name: Setup Hugo
         uses: peaceiris/actions-hugo@v2
