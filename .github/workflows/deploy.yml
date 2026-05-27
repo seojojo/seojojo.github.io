@@ -1,0 +1,31 @@
+name: Deploy Website
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1 # 기록을 가져오지 않고 현재 상태만 가져옴
+
+      - name: Setup Hugo
+        uses: peaceiris/actions-hugo@v2
+        with:
+          hugo-version: 'latest'
+
+      - name: Build Site
+        # 깃 관련 설정이 꼬여있을 수 있으므로 
+        # 테마를 강제로 무시하고 빌드하거나 캐시를 무시합니다.
+        run: hugo --gc --minify 
+
+      - name: Deploy to Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./public

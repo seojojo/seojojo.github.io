@@ -1,0 +1,13 @@
+baseURL = 'https://seojojo.github.io/'
+locale = 'ko-kr'
+title = 'AI 수업 내용'
+theme = 'ananke'
+
+[params]
+site_description = "이어드림스쿨에서 배우는 AI 서비스 엔지니어링 성장 기록"
+featured_image = ""
+ananke_socials = true
+
+[services]
+  [services.googleAnalytics]
+    id = 'G-YPB6WPE4E0'
