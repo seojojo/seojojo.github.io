@@ -1,17 +1,25 @@
-# .github/workflows/deploy.yml 파일을 아래 내용으로 교체하세요
 name: Deploy Website
 on:
   push:
     branches:
       - main
+
+# GitHub Actions 권한 부여를 위한 설정
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
+    # Node.js 24 경고 대응을 위한 환경 변수
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+      
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
         with:
-          submodules: false  # 이 한 줄이 핵심입니다.
+          submodules: false
           fetch-depth: 0
 
       - name: Setup Hugo
@@ -27,3 +35,6 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./public
+          # Git 식별자 명시
+          user_name: 'github-actions[bot]'
+          user_email: 'github-actions[bot]@users.noreply.github.com'
