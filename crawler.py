@@ -3,31 +3,36 @@ from bs4 import BeautifulSoup
 import datetime
 import os
 
-# 1. content/posts/ 폴더가 없으면 자동으로 만들기
 if not os.path.exists('content/posts'):
     os.makedirs('content/posts')
 
-url = "https://books.toscrape.com/"
-response = requests.get(url)
+base_url = "https://books.toscrape.com/"
+response = requests.get(base_url)
 soup = BeautifulSoup(response.text, 'html.parser')
 
-# 책 5권 가져오기
 books = soup.find_all('article', class_='product_pod', limit=5)
 today = datetime.date.today().strftime('%Y-%m-%d')
 
 for i, book in enumerate(books):
-    title = book.h3.a['title']
-    price = book.find('p', class_='price_color').text
+    # 1. 목록 페이지에서 상세 페이지 링크 가져오기
+    detail_url = base_url + book.h3.a['href']
     
-    # 2. 파일 저장 경로 수정 (content/posts/ 폴더 안으로)
+    # 2. 상세 페이지 접속
+    detail_res = requests.get(detail_url)
+    detail_soup = BeautifulSoup(detail_res.text, 'html.parser')
+    
+    # 3. 데이터 추출
+    title = detail_soup.find('h1').text
+    price = detail_soup.find('p', class_='price_color').text
+    # 상세 설명(요약) 가져오기: <article> 안의 <p> 태그 텍스트
+    description = detail_soup.find_all('p')[3].text 
+    
     file_path = f"content/posts/{today}-book-{i+1}.md"
     
-    # 이미 파일이 있다면 중복 생성 방지
     if not os.path.exists(file_path):
         with open(file_path, 'w', encoding='utf-8') as f:
             f.write(f"---\ntitle: \"{title}\"\ndate: {datetime.datetime.now()}\n---\n\n")
-            f.write(f"# 책 제목: {title}\n\n")
-            f.write(f"**가격:** {price}\n")
-        print(f"생성 완료: {file_path}")
-    else:
-        print(f"이미 존재함: {file_path}")
+            f.write(f"# {title}\n\n")
+            f.write(f"**가격:** {price}\n\n")
+            f.write(f"## 요약\n{description}\n")
+        print(f"상세 정보 포함 생성 완료: {file_path}")
